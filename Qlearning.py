@@ -1,8 +1,5 @@
-# -*- coding: utf-8 -*-
-
 import numpy as np
 import random
-import StaticGameResolution as sgr
 
 def roulette(dict):
 #def roulette(self, dict):
@@ -19,9 +16,9 @@ def roulette(dict):
         if tmp >= rnd:
             return s
 
-def MinimaxQ(game, explor, decay, display, iteration, playerA, playerB, policyplayerB):
+def Qlearning(game, explor, decay, display, iteration, playerA, playerB, policyplayerB):
     """
-    Minimax-Q-learning 
+    Q-learning 
     
     :param game: NullSum2PlayerStochasticGame
     :param explor: float
@@ -65,11 +62,12 @@ def MinimaxQ(game, explor, decay, display, iteration, playerA, playerB, policypl
         s2 = roulette(game.transition(s, actions))
         Q[s][o][a] = (1-alpha) * Q[s][o][a] + alpha * (rew + game.gamma() * V[s2])
         
-        V[s], pi[s] = sgr.maximin(game, Q[s], s, playerA, playerB)
+        #### Juste ça à changer : je crois que c'est simplement un max
+        ###################################################
+        #V[s], pi[s] = sgr.maximin(game, Q[s], s, playerA, playerB)
         
         s = s2
         alpha *= decay
         
     print("Learning rate at the end of the run: ", alpha)  
     return pi, V
-    

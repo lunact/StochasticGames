@@ -3,7 +3,6 @@
 import numpy as np
 from NullSum2PlayerStochasticGame import NullSum2PlayerStochasticGame
 
-
 class RockPaperScissors(NullSum2PlayerStochasticGame):
     
     dict = {"pierre":0, "papier":1, "ciseaux":2}

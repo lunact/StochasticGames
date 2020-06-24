@@ -12,7 +12,7 @@ def new_V_and_pi(game, V, playerA, playerB):
     :param game: NullSum2PlayerStochasticGame
     :param V: current value fonction (dictionary: {state: float})
     :param playerA: maximizing player ID
-    :param playerB: minimizing player ID
+    :param playerB: minimizing player IDm
     :rtype: player A strategy (dictionary: {state: {action: probability}}) and value fonction (dictionary: {state: float})
     """
     

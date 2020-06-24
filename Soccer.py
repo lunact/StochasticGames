@@ -50,7 +50,7 @@ class Soccer(NullSum2PlayerStochasticGame):
         pos1, pos2, b = state
         dest1 = self.next_position(pos1, actions[0])
         dest2 = self.next_position(pos2, actions[1])
-        
+
         # goal
         if (b == 1 and dest1 in self.goal_positions) or (b == 2 and dest2 in self.goal_positions):
             return self.initial_state()
