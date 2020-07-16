@@ -2,6 +2,20 @@
 
 import numpy as np
 
+def roulette(dict):
+        """
+        randomly return one of the dictionary's key according to its probability (its value)
+        
+        :param dict: dictionary {index: probability}
+        :rtype: index
+        """
+        rnd = np.random.rand()
+        tmp = 0
+        for s, p in dict.items():
+            tmp += p
+            if tmp >= rnd:
+                return s
+
 class Battle:
     """
     simulates a game between two policies
@@ -23,9 +37,9 @@ class Battle:
         self.nb_of_iterations = nb_of_iterations
         self.p0, self.p1 = game.players()[0], game.players()[1]
         
-        # football game
-        self.but = 0 # total number of goals
-        self.w = {player: 0 for player in game.players()} # number of goals of each player
+        self.win0 = 0 # total number of wins for player 1
+        self.win1 = 0 # total number of wins for player 2
+        #self.w = {player: 0 for player in game.players()} # number of wins for each player
         
 
     def roulette(self, dict):
@@ -55,11 +69,11 @@ class Battle:
         rewards = self.g.rewards(state, actions)
         
         if rewards.get(self.p0) == 1:
-            self.but += 1
-            self.w[self.p0] += 1
+            self.win0 += 1
+            #self.w[self.p0] += 1
         if rewards.get(self.p1) == 1:
-            self.but += 1
-            self.w[self.p1] += 1
+            self.win1 += 1
+            #self.w[self.p1] += 1
         
         return {player: (self.g.gamma() ** self.t) * r for player, r in self.g.rewards(state, actions).items()}
     
@@ -77,7 +91,6 @@ class Battle:
         def dict_sum(d1, d2):
             return {k: d1[k] + d2[k] for k in d1.keys()}
         self.total_rewards = dict_sum(self.total_rewards, self.discounted_rewards(self.current_state, actions))
-        
         # random transition to next state
         self.current_state = self.roulette(self.g.transition(self.current_state, actions))
         
@@ -103,11 +116,11 @@ class Battle:
 
     def get_winners(self):
         """
-        [football game] return the goal ratio of each player
+        return winning rates
         """
-        if self.but == 0:
-            self.but = 1
-        self.w[self.p0] /= (1.0 * self.but)  
-        self.w[self.p1] /= (1.0 * self.but)  
-        return self.w
+        #if self.but == 0:
+        #    self.but = 1
+        #self.w[self.p0] /= (1.0 * self.but)  
+        #self.w[self.p1] /= (1.0 * self.but)  
+        return self.win0, self.win1
     

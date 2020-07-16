@@ -1,90 +1,93 @@
 # -*- coding: utf-8 -*-
 
-# Test Game RPS
-
 from RockPaperScissors import RockPaperScissors
 from Soccer import Soccer
 from GridWorld import GridWorld
-from Shapley import new_V_and_pi
-from Shapley import ecart
-from Shapley import shapley
-from Littman import MinimaxQ
-from WoLF_PHC import WoLF_PHC
 from Battle import Battle
 import time
 import random
 import numpy as np
+from Agents import Agent
+from WoLF_PHC_Agent import WoLF_PHC_Agent
+from Minimax_Q_Agent import Minimax_Q_Agent
+from Random_Agent import Random_Agent
 
-def train(game,agent,adversary_policy): #renvoit la politique (et V) pour un type d'agent donné
-    p0, p1 = game.players()[0], game.players()[1]
+def benchmarking(game, playerA, playerB, player1, opponent1, player2, opponent2, nb_iterations, display_nb):
+    """
+    A training function
+    
+    :param playerA: maximizing player ID
+    :param playerB: minimizing player ID
+    :param player1: Agent
+    :param opponent1: Training opponent Agent for player1
+    :param player2: Agent
+    :param opponent2: Training opponent Agent for player2
+    :param nb_iteration: number of iterations for training
+    :param display_nb: integer (number of iterationsto print at every 'display_nb' iterations)
+    
+    :rtype: player1 strategy (dictionary: {state: {action: probability}}) and player2 strategy (dictionary: {state: {action: probability}})
+    """
+    # train :
+    policy1_list,V_1_list = player1.training(game,playerA,playerB,nb_iterations,opponent1,display_nb)
+    policy2_list,V_2_list = player2.training(game,playerA,playerB,nb_iterations,opponent2,display_nb)
+    # analyse : time, convergence to stationnary (pi : ecarts successifs tendent vers 0), convergence to nash (regarder V)
+    #todo
+    return policy1_list[-1], policy2_list[-1] #final policies
 
-    if (agent == "Random") :
-        pi = {state: {action: 1/len(game.actions(p1, state)) for action in game.actions(p1, state)} for state in game.states()}
-        return pi
-
-    if (agent == "Shapley") :
-        #shapleyepsilon = 0.0
-        shapleyepsilon = 10** -7 
-        start_time = time.time()
-        pi,V = shapley(game, epsilon = shapleyepsilon,playerA = p1,playerB = p0)
-        print("Time shapley : ",time.time() - start_time)
-        return pi,V
-
-    if (agent == "Littman") :
-        explor = .3
-        decay = .01 ** (1. / ( 2 *10**4))
-        display = 10000
-        iteration = 2* 10**4
-        start_time = time.time()
-        pi,V = MinimaxQ(game,explor,decay,display,iteration,playerA=p0,playerB=p1,policyplayerB=adversary_policy)
-        print("Time Littman : ",time.time() - start_time)
-        return pi,V
-
-    if (agent == "WolF_PHC") :
-        explor = .3
-        decay = .01 ** (1. / ( 2 *10**4))
-        delta_win = 0.0025
-        delta_lose = 0.01
-        display = 100
-        iteration = 1000
-        start_time = time.time()
-        pi_wolf,V_wolf = WoLF_PHC(game,explor,decay,delta_win,delta_lose,display,iteration,playerA=p0,playerB=p1,policyplayerB=adversary_policy)
-        print("Time WolF : ",time.time() - start_time)
-        return pi_wolf,V_wolf
-
-    if (agent == "Qlearning") :
-        pi = 0
-        return pi
-
-
-def Benchmarking(Game,nbplay,agentA,agentB):
-    if (Game == "RockPaperScissors"):
-        game = RockPaperScissors()
-    if (Game == "Soccer") :
-        game = Soccer()
-    if (Game == "GridWorld") :
-        game = GridWorld()
-    p0, p1 = game.players()[0], game.players()[1]
-    RandomPlayer =  {state: {action: 1/len(game.actions(p1, state)) for action in game.actions(p1, state)} for state in game.states()}
-    adversary_policy = RandomPlayer
-    #policyA,V_A = train(game,agentA,adversary_policy)
-    #policyB = train(game,agentB,adversary_policy)
-    policyA = RandomPlayer
-    policyB = RandomPlayer
-    policy  = {p0 : policyA , p1 :policyB }
-
+def affrontement(game,playerA,playerB,policy1,policy2,nbplay):
+    """
+    Simulation of game
+    
+    :param playerA: maximizing player ID
+    :param playerB: minimizing player ID
+    :param policy1: player1 strategy (dictionary: {state: {action: probability}}) 
+    :param policy2: player2 strategy (dictionary: {state: {action: probability}}) 
+    :param nb_play: integer number of iterations
+    """
+    #uses battle to have policy A and B play against each other
+    policy  = {playerA : policy1 , playerB : policy2 }
     battle = Battle(game,nbplay,policy )
     battle.simulation()
     print("total_rewards")
     print(battle.total_rewards)
-    print("winers :",battle.get_winners()," nombre fois arrive en etat but",battle.but )
-    #+ faire les autres analyses/graphiques ici :
-    #new_pi , new_V= new_V_and_pi(game, V_shap,playerA = p1,playerB = p0)
-    #print("ecart entre new_V et val de Shapley : ")
-    #print(ecart(new_V,V_shap)) 
+    wins1,wins2 = battle.get_winners()
+    print("player1 won :",wins1,"times out of ",nbplay,"games")
+    print("player2 won :",wins2,"times out of ",nbplay,"games")
 
-#pour lancer on utilise :
-agent = ["Random","Shapley", "Littman", "WolF_PHC", "Qlearning"]
-game = ["RockPaperScissors","Soccer","GridWorld"]
 
-Benchmarking(game[2] , 100 , agent[0] , agent[0])
+def test():
+    """
+    Testing function : Training for a given game and 2 agents, and Battle between both agents
+    """
+
+    #Choose Game :
+    #game = Soccer()
+    game = RockPaperScissors()
+    #game = GridWorld()
+
+    playerA, playerB = game.players()[0], game.players()[1] #player ID
+
+    #Choose Player A and training opponent (agents):
+    player1 = WoLF_PHC_Agent(game, playerA, playerB)
+    #opponent1 = WoLF_PHC_Agent(game, playerB, playerA)
+    opponent1 = Random_Agent(game, playerB, playerA)
+
+    #Choose Player B and training opponent (agents):
+    #player2 = WoLF_PHC_Agent(game, playerA, playerB)
+    #opponent2 = WoLF_PHC_Agent(game, playerB, playerA)
+    player2 = Minimax_Q_Agent(game, playerA, playerB)
+    opponent2 = Minimax_Q_Agent(game, playerB, playerA)
+
+    #Train policies :
+    nb_iterations = 10000
+    display_nb = 1000
+    policy1, policy2 = benchmarking(game, playerA, playerB, player1, opponent1, player2, opponent2, nb_iterations, display_nb)
+
+    #Battle :
+    print("Battle")
+    nbplay = 10000
+    affrontement(game,playerA,playerB,policy1,policy2,nbplay) 
+    #score = affrontement(policy1,policy2) 
+    #print(score)
+
+test()

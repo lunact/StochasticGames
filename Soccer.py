@@ -96,23 +96,5 @@ class Soccer(NullSum2PlayerStochasticGame):
             return -1
         
         return 0
-    
-    
-    def toString(self, state):
-        pos1, pos2, b = state
-        s = ""
-        for c in self.cells:
-            if c[1] == 1:
-                s += "\n"
-            if c == pos1 and b == 1:
-                s += "A "
-            elif c == pos1 and b == 2:
-                s += "a "
-            elif c == pos2 and b == 1:
-                s += "b "
-            elif c == pos2 and b == 2:
-                s += "B "
-            else:
-                s += "_ "
-        return s
+
     
