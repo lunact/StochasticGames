@@ -20,6 +20,7 @@ class GridWorld(StochasticGame):
         
 
     def next_position(self, position, action):
+        #return (position[0]+self.movement[action][0],position[1]+self.movement[action][1])
         return tuple(map(sum, zip(position, self.movement[action])))
     
     
@@ -40,13 +41,16 @@ class GridWorld(StochasticGame):
     
     def initial_state(self):
         return {self.starting_positions : 1 }
-    
+
+    def indicatrice(self,pos,dest):
+        if (pos == (0,0) and dest == (1,0)) or (pos == (0,2) and dest == (1,2)):
+            return 1
+        else:
+            return 0
     
     def transition(self, state, actions): #renvoit dictionnaire {état:proba}
-    
         # positions actuelles :
         pos1, pos2 = state
-        print(pos1,pos2)
         # positions potentielles :
         dest1 = self.next_position(pos1, actions[0])
         dest2 = self.next_position(pos2, actions[1])
@@ -55,40 +59,23 @@ class GridWorld(StochasticGame):
         # goal :
         if (dest1 == self.goal_position) or (dest2 == self.goal_position):
             return self.initial_state()
-
-        # positions 0 et 2 :
-        if pos1 == (0,0) and dest1 == (1,0) :
-            if pos2 == (0,2) and dest2 == (1 ,2) :
-                return { ((0,0),(0,2)):0.25, ((1,0),(0,2)):0.25 , ((0,0),(1,2)):0.25 , ((1,0),(1,2)):0.25}
+        # si même destination :
+        if (dest1 == dest2):
+            return { (pos1,pos2):1 }
+        # tout le reste
+        else :
+            if (dest1 == pos2) :
+                A = (1-0.5*self.indicatrice(pos1,dest1))*(0.5*self.indicatrice(pos2,dest2))
             else :
-                return { ((0,0),dest2):0.5, ((1,0),dest2):0.5}
-
-        if pos2 == (0,0) and dest2 == (1,0) :
-            if pos1 == (0,2) and dest1 == (1 ,2) :
-                return { ((0,2),(0,0)):0.25, ((0,2),(1,0)):0.25 , ((1,2),(0,0)):0.25 , ((1,2),(1,0)):0.25}
+                A = 0
+            if (pos1 == dest2) :
+                B = (0.5*self.indicatrice(pos1,dest1))*(1-0.5*self.indicatrice(pos2,dest2))
             else :
-                return { (dest1,(0,0)):0.5, (dest1,(1,0)):0.5}
+                B = 0
+            C = (1-0.5*self.indicatrice(pos1,dest1))*(1-0.5*self.indicatrice(pos2,dest2))
+            return { (pos1,pos2):1-(A+B+C),(dest1,pos2):A,(pos1,dest2):B,(dest1,dest2):C}
 
-        if pos1 == (0,2) and dest1 == (1,2) :
-            if pos2 == (0,0) and dest2 == (1 ,0) :
-                return { ((0,2),(0,0)):0.25, ((0,2),(1,0)):0.25 , ((1,2),(0,0)):0.25 , ((1,2),(1,0)):0.25}
-            else :
-                return { ((0,2),dest2):0.5, ((1,2),dest2):0.5}
-
-        if pos2 == (0,2) and dest2 == (1,2) :
-            if pos1 == (0,0) and dest1 == (1 ,0) :
-                return { ((0,0),(0,2)):0.25, ((1,0),(0,2)):0.25 , ((0,0),(1,2)):0.25 , ((1,0),(1,2)):0.25}
-            else :
-                return { (dest1,(0,2)):0.5, (dest1,(1,2)):0.5}
-        
-        # la même position :
-        if dest1 == dest2:
-            return {(pos1,pos2) : 1}
-        
-        # normal :
-        return {(dest1, dest2): 1} 
     
-
     def rewards(self, state, actions): # recompenses immédiates {0:r1,1:r2}
         pos1, pos2 = state
         dest1 = self.next_position(pos1, actions[0])

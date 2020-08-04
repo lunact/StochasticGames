@@ -68,10 +68,10 @@ class Battle:
         
         rewards = self.g.rewards(state, actions)
         
-        if rewards.get(self.p0) == 1:
+        if rewards.get(self.p0) > 0:
             self.win0 += 1
             #self.w[self.p0] += 1
-        if rewards.get(self.p1) == 1:
+        if rewards.get(self.p1) > 0:
             self.win1 += 1
             #self.w[self.p1] += 1
         

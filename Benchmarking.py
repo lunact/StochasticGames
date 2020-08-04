@@ -5,6 +5,7 @@ from non_RL_Agent import non_RL_Agent
 from WoLF_PHC_Agent import WoLF_PHC_Agent
 from Minimax_Q_Agent import Minimax_Q_Agent
 from Random_Agent import Random_Agent
+from Shapley_Agent import Shapley_Agent
 
 from RockPaperScissors import RockPaperScissors
 from Soccer import Soccer
@@ -60,9 +61,9 @@ def test():
     """
 
     #Choose Game :
-    game = Soccer()
+    #game = Soccer()
     #game = RockPaperScissors()
-    #game = GridWorld()
+    game = GridWorld()
 
     playerA, playerB = game.players()[0], game.players()[1] #player ID
 
@@ -87,15 +88,15 @@ def test():
 
 
     # OR for simultaneous learning, choose player1 and player2 directly :
-    player1 = WoLF_PHC_Agent(game, 0)
-    player2 = Random_Agent(game, 1)
+    player1 = WoLF_PHC_Agent(game, playerA)
+    player2 = Random_Agent(game, playerB)
     #Train policies :
-    nb_iterations = 100000
+    nb_iterations = 1000
     policy1, policy2 = Scheduler(game,nb_iterations,player1,player2)
 
     #Battle :
     print("Battle")
-    nbplay = 10000
+    nbplay = 1000
     affrontement(game,policy1,policy2,nbplay)
     #score = affrontement(policy1,policy2) 
     #print(score)

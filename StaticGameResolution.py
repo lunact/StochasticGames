@@ -43,7 +43,7 @@ def maximin(game, expected_rewards, state):
         # Solving
         mod.optimize()
         
-        return(V.x, {action0: pi_s[i].x for i, action0 in enumerate(game.actions(playerA, state))})
+        return(V.x, {action0: pi_s[i].x for i, action0 in enumerate(game.actions(0, state))})
     
     except GurobiError:
         print('Error reported')
