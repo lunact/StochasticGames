@@ -16,7 +16,7 @@ class GridWorld_Nash1_Agent(non_RL_Agent):
         for x in self.g.cells :
             if x != (2,1) :
                 if x != (0,2) :
-                    self.pi[(x,(0,2))]['Right'] = 1
+                    self.pi[(x,(0,2))]['Left'] = 1
                 if x != (0,1) :
                     self.pi[(x,(0,1))]['Up'] = 1
                 if x != (1,1) :
