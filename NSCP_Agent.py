@@ -6,7 +6,7 @@ from gurobipy import *
 
 class NSCP_Agent(RL_Agent):
     """
-    A Specific Agent class for WoLF-PHC Agent
+    A Specific Agent class for NSCP Agent
     """
     
     def __init__(self,game,playerID):

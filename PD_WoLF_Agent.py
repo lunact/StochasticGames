@@ -5,7 +5,7 @@ import random
 
 class PD_WoLF_Agent(RL_Agent):
     """
-    A Specific Agent class for WoLF-PHC Agent
+    A Specific Agent class for PD-WoLF Agent
     """
     
     def __init__(self,game,playerID):

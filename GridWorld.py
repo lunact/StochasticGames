@@ -65,15 +65,23 @@ class GridWorld(StochasticGame):
         # tout le reste
         else :
             if (dest1 == pos2) :
-                A = (1-0.5*self.indicatrice(pos1,dest1))*(0.5*self.indicatrice(pos2,dest2))
+                if ((dest1 == (0,2) and pos2 == (0,2)) or (dest1 == (0,0) and pos2 == (0,0))) :
+                    A = 0
+                else :
+                    A = (1-0.5*self.indicatrice(pos1,dest1))*(0.5*self.indicatrice(pos2,dest2))
             else :
                 A = 0
             if (pos1 == dest2) :
-                B = (0.5*self.indicatrice(pos1,dest1))*(1-0.5*self.indicatrice(pos2,dest2))
+                if ((pos1==(0,0) and dest2==(0,0)) or (pos1==(0,2) and dest2==(0,2))) :
+                    B = 0
+                else :
+                    B = (0.5*self.indicatrice(pos1,dest1))*(1-0.5*self.indicatrice(pos2,dest2))
             else :
                 B = 0
             C = (1-0.5*self.indicatrice(pos1,dest1))*(1-0.5*self.indicatrice(pos2,dest2))
-            return { (pos1,pos2):1-(A+B+C),(dest1,pos2):A,(pos1,dest2):B,(dest1,dest2):C}
+
+            sol = { (pos1,pos2):1-(A+B+C),(dest1,pos2):A,(pos1,dest2):B,(dest1,dest2):C}
+            return sol
 
     
     def rewards(self, state, actions): # recompenses immédiates {0:r1,1:r2}

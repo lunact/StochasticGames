@@ -65,7 +65,7 @@ class Shapley_Agent(non_RL_Agent):
         s = sum(abs(V1[state] - V2[state]) for state in V1.keys())
         return m, s
 
-    def maximin(self, state):
+    def maximin(self, state, expected_rewards):
         """
         solve the static game associated with one state of a null sum 2-player stochastic game
     
@@ -88,7 +88,7 @@ class Shapley_Agent(non_RL_Agent):
             # Constraints
             for action1 in self.g.actions(1, state):
                 # conversion dictionary > np.array while preserving the same order for actions
-                expected_rewards_action1 = np.array([self.Q[state][action1][a] for a in self.g.actions(self.playerID, state)])
+                expected_rewards_action1 = np.array([expected_rewards[state][action1][a] for a in self.g.actions(self.playerID, state)])
                 m.addConstr(V <= np.dot(pi_s, expected_rewards_action1), "")
             m.addConstr(sum(pi_s) >= 1.0, "")
             m.addConstr(sum(pi_s) <= 1.0, "")
@@ -102,7 +102,7 @@ class Shapley_Agent(non_RL_Agent):
         except GurobiError:
             print('Error reported')
 
-    def new_V_and_pi(self):
+    def new_V_and_pi(self,V):
         """
         compute the next value of V based on its current value
     
@@ -115,8 +115,8 @@ class Shapley_Agent(non_RL_Agent):
         def G_a(state, actions, V):
             R = self.g.rewards(state, actions)
             R_s_a = R.get(0)
-        
-            T_s_a = self.g.transition(state, actions)
+
+            T_s_a = {x:y for x,y in self.g.transition(state, actions).items() if y>0}
             gamma = self.g.gamma()
             return R_s_a + gamma * sum(T_s_a[state2] * V[state2] for state2 in T_s_a.keys())
         
@@ -124,7 +124,7 @@ class Shapley_Agent(non_RL_Agent):
         G = {state: \
                  {actionB: \
                       {actionA : \
-                           G_a(state, {0: actionA, 1: actionB}, self.V) \
+                           G_a(state, {0: actionA, 1: actionB}, V) \
                       for actionA in self.g.actions(0, state)} \
                  for actionB in self.g.actions(1, state)} \
             for state in self.g.states()}
@@ -132,7 +132,7 @@ class Shapley_Agent(non_RL_Agent):
         # for each state the associated static game is solved with linear programming to get the new V and pi
         new_V, pi = {}, {}
         for state in self.g.states():
-            new_V[state], pi[state] = self.maximin(state)
+            new_V[state], pi[state] = self.maximin(state, G)
         
         return pi, new_V
 
@@ -146,14 +146,14 @@ class Shapley_Agent(non_RL_Agent):
         V = {state: np.random.rand() for state in self.g.states()}
     
         # first iteration on value
-        pi, V2 = self.new_V_and_pi()
+        pi, V2 = self.new_V_and_pi(V)
         ite = 1
     
         # repeat until convergence
         m, _ = self.ecart(V, V2) 
         while m > self.epsilon:
             V = copy.deepcopy(V2)
-            pi, V2 = self.new_V_and_pi()
+            pi, V2 = self.new_V_and_pi(V)
             ite += 1
             m, _ = self.ecart(V, V2) 
         print("Number of iterations: "+str(ite))
