@@ -24,6 +24,7 @@ class RL_Agent(Agent):
     def __init__(self,game,playerID):
         self.playerID = playerID
         self.g = game
+        self.explor = 0.3
         self.pi = {state: {action: 1/len(game.actions(playerID, state)) for action in game.actions(playerID, state)} for state in game.states()}  
 
 
@@ -35,7 +36,7 @@ class RL_Agent(Agent):
         action = random.choice(self.g.actions(playerID, s)) if np.random.rand() < self.explor else roulette(self.pi[s])
         return action 
 
-    def learn(self,s,s2,k,a,o,rew,opponent_policy): #old update
+    def learn(self,s,s2,k,a,o,rewA,rewB,opponent_policy):
         """Returns updated policy and V table
         
         :rtype: strategy (dictionary: {state: {action: probability}}) and value fonction (dictionary: {state: float})

@@ -22,8 +22,3 @@ class GridWorld_Nash1_Agent(non_RL_Agent):
                 if x != (1,1) :
                     self.pi[(x,(1,1))]['Up'] = 1
         return self.pi
-
-#game = GridWorld()
-#A = GridWorld_Nash1_Agent(game,1)
-#pi = A.compute_policy()
-#print(pi)

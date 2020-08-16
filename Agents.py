@@ -20,7 +20,7 @@ class Agent:
         """
         raise(NotImplementedError)
 
-    def learn(self,s,s2,k,a,o,rew,opponent_policy):
+    def learn(self,s,s2,k,a,o,rewA,rewB,opponent_policy):
         """Returns updated policy and V table, and (optimal) policy for non RL Agents
         
         :rtype: strategy (dictionary: {state: {action: probability}}) and value fonction (dictionary: {state: float})

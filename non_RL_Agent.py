@@ -37,7 +37,7 @@ class non_RL_Agent(Agent):
         action = self.roulette(self.pi[s])
         return action
 
-    def learn(self,s,s2,k,a,o,rew,opponent_policy): #old update
+    def learn(self,s,s2,k,a,o,rewA,rewB,opponent_policy):
         return self.pi
 
 
