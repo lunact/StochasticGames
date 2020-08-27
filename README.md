@@ -1,11 +1,7 @@
 # StochasticGames
 
 An implementation of some Multi-Agent Reinforcement Learning Algorithms :
-- Minimax-Q
-- WoLF-PHC
-- Shapley, Random Agent, Q-learning, PD-WoLF.....
+- RL Agents : Q-Learning, Minimax-Q, NSCP, EXORL, WoLF-PHC, PD-WoLF
+- non-RL Agents : Random Agent, Shapley, and optimal Nash Agents for GridWorld Game
 
-**Structure :**
-> Games : todo explain
-
-> Agents : todo explain
+Games : GridWorld 2 - Hu and Wellman (2003) NashQ, Soccer Game - Littman (1994)
